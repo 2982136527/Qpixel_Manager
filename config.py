@@ -11,7 +11,7 @@ db_config = {
     'host': '192.168.6.235',
     'database': 'QPM',
     'user': 'qiuhu',
-    'password': '2003114@fhh21'
+    'password': '88188818'
 }
 
 # 此函数用于配置日志
