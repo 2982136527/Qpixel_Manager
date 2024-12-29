@@ -1,0 +1,30 @@
+version: '3'
+services:
+  app:
+    build: .
+    volumes:
+      - .:/app
+      - logs:/app/logs  # 挂载日志文件卷
+    ports:
+      - "5001:5001"  # 将容器的 5001 端口映射到宿主机的 5001 端口
+    command: ["sh", "-c", "python InputImg.py"]
+    logging:
+      driver: json-file
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+  worker:
+    build: .
+    volumes:
+      - .:/app
+      - logs:/app/logs
+    command: ["celery", "-A", "InputImg.celery", "worker", "--loglevel=info"]
+    logging:
+      driver: json-file
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+volumes:
+  logs:

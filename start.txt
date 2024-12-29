@@ -1,0 +1,6 @@
+celery -A InputImg.celery worker --loglevel=info
+pycharm InputImg.py
+
+
+
+MySQL和Redis配置在config.py修改

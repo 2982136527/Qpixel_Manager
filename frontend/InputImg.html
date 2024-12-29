@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Folder and Images</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            color: #333;
+            text-shadow: inset -2px -2px 4px rgba(255, 255, 255, 0.7), inset 2px 2px 4px rgba(0, 0, 0, 0.1);
+            font-size: 24px;
+            margin: 10px 0;
+        }
+
+        h4 {
+            color: #333;
+            text-shadow: inset -2px -2px 4px rgba(255, 255, 255, 0.7), inset 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        span {
+            color: red;
+            font-size: 20px;
+        }
+        form {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: inset -3px -3px 6px rgba(255, 255, 255, 0.7), inset 3px 3px 6px rgba(0, 0, 0, 0.1), 4px 4px 10px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        label {
+            display: block;
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            box-shadow: inset -2px -2px 4px rgba(255, 255, 255, 0.7), inset 2px 2px 4px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background: #4caf50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: -2px -2px 4px rgba(255, 255, 255, 0.7), 2px 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        button:hover {
+            background: #45a045;
+            box-shadow: inset -2px -2px 4px rgba(255, 255, 255, 0.7), inset 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #progress-container {
+            width: 100%;
+            background: #d9d9d9;
+            border-radius: 15px;
+            margin-top: 10px;
+            overflow: hidden;
+            box-shadow: inset -2px -2px 4px rgba(255, 255, 255, 0.7), inset 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        #progress-bar {
+            width: 0;
+            height: 20px;
+            background: linear-gradient(90deg, #4caf50, #66bb6a);
+            text-align: center;
+            line-height: 20px;
+            color: #fff;
+            border-radius: 15px;
+            transition: width 0.3s ease;
+        }
+
+        #progress-bar::after {
+            content: attr(data-percent);
+            position: relative;
+            color: #fff;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <h2>上传页面</h2>
+    <h4>！！注意同时上传不要超过“<span>500</span>”张图片</h4>
+    <!-- Upload Folder -->
+    <form id="uploadFolderForm">
+        <label for="folderInput">选择文件夹:</label>
+        <input type="file" id="folderInput" name="folder" webkitdirectory directory multiple><br>
+        <button type="button" onclick="uploadFolder()">上传文件夹</button>
+    </form>
+
+    <!-- Upload Images -->
+    <form id="uploadImagesForm">
+        <label for="imageInput">选择图片:</label>
+        <input type="file" id="imageInput" name="images" multiple><br>
+        <button type="button" onclick="uploadImages()">上传图片</button>
+    </form>
+
+    <!-- Progress Bar -->
+    <div id="progress-container" style="display:none;">
+        <div id="progress-bar" data-percent="0%"></div>
+    </div>
+
+    <script>
+    // Function to upload folder
+    function uploadFolder() {
+        var folderInput = document.getElementById('folderInput');
+        var formData = new FormData();
+
+        // Add all files from the folder to FormData
+        Array.from(folderInput.files).forEach(file => {
+            formData.append('folder', file);
+        });
+
+        // Show progress bar
+        document.getElementById('progress-container').style.display = 'block';
+
+        // Send request using XMLHttpRequest with progress tracking
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', `${window.location.origin}/upload_folder`, true);
+
+        // Track upload progress
+        xhr.upload.addEventListener('progress', function(e) {
+            if (e.lengthComputable) {
+                var percent = (e.loaded / e.total) * 100;
+                var progressBar = document.getElementById('progress-bar');
+                progressBar.style.width = percent + '%';
+                progressBar.setAttribute('data-percent', Math.round(percent) + '%'); // Update data-percent
+            }
+        });
+
+        // Handle response
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                alert('Folder uploaded successfully!');
+            } else {
+                alert('Error uploading folder');
+            }
+        };
+
+        // Send FormData
+        xhr.send(formData);
+    }
+
+    // Function to upload images
+    function uploadImages() {
+        var imageInput = document.getElementById('imageInput');
+        var formData = new FormData();
+
+        // Add selected image files to FormData
+        Array.from(imageInput.files).forEach(file => {
+            formData.append('images', file);
+        });
+
+        // Show progress bar
+        document.getElementById('progress-container').style.display = 'block';
+
+        // Send request using XMLHttpRequest with progress tracking
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', `${window.location.origin}/upload_images`, true);
+
+        // Track upload progress
+        xhr.upload.addEventListener('progress', function(e) {
+            if (e.lengthComputable) {
+                var percent = (e.loaded / e.total) * 100;
+                var progressBar = document.getElementById('progress-bar');
+                progressBar.style.width = percent + '%';
+                progressBar.setAttribute('data-percent', Math.round(percent) + '%'); // Update data-percent
+            }
+        });
+
+        // Handle response
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                alert('Images uploaded successfully!');
+            } else {
+                alert('Error uploading images');
+            }
+        };
+
+        // Send FormData
+        xhr.send(formData);
+    }
+</script>
+</body>
+</html>

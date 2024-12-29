@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QGallery</title>
+    <link href="../static/fontawesome/css/fontawesome.css" rel="stylesheet" />
+    <link href="../static/fontawesome/css/brands.css" rel="stylesheet" />
+    <link href="../static/fontawesome/css/solid.css" rel="stylesheet" />
+
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+            margin: 0;
+            padding: 10px 0;
+            font-size: 36px;
+            color: #1e3a8a;
+            text-shadow:
+                1px 1px 2px rgba(255, 255, 255, 0.7),
+                0px 0px 5px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(45deg, #4f81e3, #6a98e8);
+            -webkit-background-clip: text;
+            color: transparent;
+            font-weight: bold;
+            border-radius: 10px;
+            box-shadow:
+                2px 2px 8px rgba(0, 0, 0, 0.2),
+                -2px -2px 5px rgba(255, 255, 255, 0.6);
+        }
+
+        .gallery {
+            column-count: 4;
+            column-gap: 10px;
+            padding: 10px;
+            margin-left: 120px; /* 默认显示侧边栏时的留白 */
+            transition: margin-left 0.3s ease;
+        }
+        .gallery .image-item {
+            width: 100%;
+            margin-bottom: 10px;
+            border-radius: 10px; /* 设置圆角为10px */
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden; /* 这将确保圆角也被应用到图片上 */
+        }
+
+        .gallery .image-item img {
+            width: 100%;
+            display: block;
+            border-radius: 10px; /* 同时给图片也设置圆角 */
+        }
+        .gallery .image-item:hover {
+            transform: scale(1.05);
+        }
+
+        .delete-image {
+            background-color: #c62828; /* 红色背景 */
+            color: white; /* 白色字体 */
+            border: none; /* 无边框 */
+            border-radius: 5px; /* 圆角边框 */
+            padding: 5px 10px; /* 内边距 */
+            font-size: 14px; /* 字体大小 */
+            cursor: pointer; /* 鼠标手形 */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* 阴影效果 */
+            position: absolute;
+            top: 5px;
+            left: 5px; /* 放到左边 */
+            z-index: 10;
+            transition: background-color 0.3s ease, transform 0.2s ease; /* 渐变效果 */
+        }
+
+        .delete-image:hover {
+            background-color: #b71c1c; /* 鼠标悬停时的背景色 */
+            transform: scale(1.05); /* 鼠标悬停时放大 */
+        }
+
+        .delete-image:active {
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2); /* 鼠标点击时的阴影效果 */
+            transform: translateY(1px); /* 点击时的下移效果 */
+        }
+
+        /* 添加图标 */
+        .delete-image:before {
+            content: "\f00d"; /* FontAwesome 删除图标代码 */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            margin-right: 5px; /* 图标和文字之间的间距 */
+        }
+
+        .recover-image {
+            background-color: #28a745; /* 绿色背景，表示恢复操作 */
+            color: white; /* 白色字体 */
+            border: none; /* 无边框 */
+            border-radius: 5px; /* 圆角边框 */
+            padding: 5px 10px; /* 内边距 */
+            font-size: 14px; /* 字体大小 */
+            cursor: pointer; /* 鼠标手形 */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* 阴影效果 */
+            position: absolute;
+            top: 5px;
+            right: 5px; /* 根据实际情况调整位置 */
+            z-index: 10;
+            transition: background-color 0.3s ease, transform 0.2s ease; /* 渐变效果 */
+        }
+
+        .recover-image:hover {
+            background-color: #218838; /* 鼠标悬停时的背景色 */
+            transform: scale(1.05); /* 鼠标悬停时放大 */
+        }
+
+        .recover-image:active {
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2); /* 鼠标点击时的阴影效果 */
+            transform: translateY(1px); /* 点击时的下移效果 */
+        }
+
+        /* 添加图标 */
+        .recover-image:before {
+            content: "\f021"; /* FontAwesome 撤销图标代码 */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            margin-right: 5px; /* 图标和文字之间的间距 */
+        }
+
+        .add-tag-image {
+            background-color: #4CAF50; /* 绿色背景 */
+            color: white; /* 白色字体 */
+            border: none; /* 无边框 */
+            border-radius: 5px; /* 圆角边框 */
+            padding: 5px 10px; /* 内边距 */
+            font-size: 14px; /* 字体大小 */
+            cursor: pointer; /* 鼠标手形 */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* 阴影效果 */
+            position: absolute;
+            top: 5px;
+            right: 5px; /* 根据实际情况调整位置 */
+            z-index: 10;
+            transition: background-color 0.3s ease, transform 0.2s ease; /* 渐变效果 */
+        }
+
+        .add-tag-image:hover {
+            background-color: #45a049; /* 鼠标悬停时的背景色 */
+            transform: scale(1.05); /* 鼠标悬停时放大 */
+        }
+
+        .add-tag-image:active {
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2); /* 鼠标点击时的阴影效果 */
+            transform: translateY(1px); /* 点击时的下移效果 */
+        }
+
+        /* 添加图标 */
+        .add-tag-image:before {
+            content: "\f02b"; /* FontAwesome 图标代码，这里使用的是标签图标 */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            margin-right: 5px; /* 图标和文字之间的间距 */
+        }
+
+        #originalImageModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        #originalImageModal.active {
+            display: flex;
+            opacity: 1;
+        }
+        #originalImageModal img {
+            max-width: 90%;
+            max-height: 90%;
+            border: 5px solid white;
+            border-radius: 10px;
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+        #originalImageModal.active img {
+            transform: scale(1);
+        }
+
+        .search-btn {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1001;
+            padding: 10px 20px;
+            background-color: #f8f8f8;
+            border: 1px solid #cccccc;
+            border-radius: 15px;
+            box-shadow: inset 0 1px 0 #ffffff, 0 1px 3px rgba(0, 0, 0, 0.5);
+            color: #666666;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-btn:hover {
+            background-color: #f2f2f2;
+        }
+
+        .search-box {
+            position: fixed;
+            top: 50px;
+            right: 10px;
+            z-index: 1000;
+            background-color: #f8f8f8;
+            border: 1px solid #cccccc;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.4);
+            display: none; /* 默认不显示 */
+            opacity: 0;
+            transition: opacity 0.5s ease, top 0.5s ease;
+        }
+
+        .search-box.active {
+            display: block; /* 显示输入框 */
+            opacity: 1;
+            top: 60px; /* 稍微向下移动，以显示渐变效果 */
+        }
+
+        .search-box input[type="text"] {
+            width: 200px;
+            padding: 10px;
+            margin-right: 5px;
+            border: 1px solid #cccccc;
+            border-radius: 15px;
+            background-color: #ffffff;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+        }
+
+        .search-box button {
+            padding: 10px 15px;
+            background-color: #f8f8f8;
+            border: 1px solid #cccccc;
+            border-radius: 15px;
+            box-shadow: inset 0 1px 0 #ffffff, 0 1px 3px rgba(0, 0, 0, 0.5);
+            color: #666666;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-box button:hover {
+            background-color: #f2f2f2;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 120px;
+            height: 100%;
+            background: #e0e0e0;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.2);
+            border-right: 1px solid #ccc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            transition: transform 0.3s ease;
+        }
+        .sidebar.hidden {
+            transform: translateX(-100%);
+        }
+        .sidebar button {
+            background: #ffffff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            box-shadow: inset -2px -2px 5px rgba(255, 255, 255, 0.7), inset 2px 2px 5px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+        }
+        .sidebar button:hover {
+            background: #f0f0f0;
+        }
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .sidebar li {
+            margin: 10px 0;
+        }
+        .sidebar a {
+            text-decoration: none;
+            color: #333;
+            font-size: 18px;
+            display: block;
+            padding: 10px 15px;
+            border-radius: 5px;
+            box-shadow: inset -2px -2px 5px rgba(255, 255, 255, 0.7), inset 2px 2px 5px rgba(0, 0, 0, 0.1);
+            transition: background 0.2s ease, box-shadow 0.2s ease;
+        }
+        .sidebar a:hover {
+            background: #dcdcdc;
+            box-shadow: inset -3px -3px 7px rgba(255, 255, 255, 0.8), inset 3px 3px 7px rgba(0, 0, 0, 0.15);
+        }
+
+        .open-sidebar-btn {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            width: 45px;
+            height: 45px;
+            background-color: #f8f8f8;
+            border: 1px solid #cccccc;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 2000;
+            box-shadow: inset 0 1px 0 #ffffff, 0 1px 3px rgba(0, 0, 0, 0.5);
+            color: #666666;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        .open-sidebar-btn.hidden {
+            display: none;
+        }
+        .open-sidebar-btn:hover {
+            background: #dcdcdc;
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px; /* 标签之间的间距 */
+            margin : 4px 4px;
+        }
+
+        .tags-container:empty {
+            display: none;
+        }
+
+        .tag {
+            background-color: #f0e68c; /* 背景颜色，类似于纸张 */
+            color: #8b4513; /* 文本颜色，深棕色 */
+            padding: 4px 8px; /* 内边距 */
+            border-radius: 8px; /* 圆角 */
+            border: 1px solid #d2b48c; /* 边框，模仿缝线 */
+            box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.3); /* 阴影，增加立体感 */
+            text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.6); /* 文本阴影，增加层次感 */
+            font-family: 'Times New Roman', serif; /* 选择一个有衬线的字体 */
+            font-size: 14px; /* 字体大小 */
+            line-height: 1.4; /* 行高 */
+            transition: transform 0.1s ease-in-out; /* 过渡动画 */
+        }
+
+        .tag:hover {
+            transform: translateY(-2px); /* 鼠标悬停时上移 */
+            box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4); /* 阴影变化 */
+            cursor: pointer;
+        }
+
+        .tag:active {
+            transform: translateY(1px); /* 鼠标点击时下移 */
+            box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.3); /* 阴影变化 */
+        }
+
+        #iframeModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        #iframeModal.active {
+            display: flex;
+            opacity: 1;
+        }
+        #iframeModal iframe {
+            width: 80%;
+            height: 80%;
+            border-radius: 10px;
+        }
+        .loading-message {
+            text-align: center;
+            font-size: 18px;
+            color: #666;
+            margin: 20px 0;
+        }
+        #originalImageModal img.modal-image {
+            transition: transform 0.25s ease;
+            transform-origin: center center;
+            display: block; /* 确保图片不被截断 */
+            max-width: 90%; /* 或其他适合的最大宽度 */
+            max-height: 90%; /* 或其他适合的最大高度 */
+        }
+
+        /* 移动端专用样式 */
+        @media (max-width: 768px) {
+            .open-sidebar-btn {
+                display: block; /* 确保在移动端显示按钮 */
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                z-index: 2000;
+                width: 45px;
+                height: 45px;
+                background-color: #f8f8f8;
+                border: 1px solid #cccccc;
+                border-radius: 50%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+                box-shadow: inset 0 1px 0 #ffffff, 0 1px 3px rgba(0, 0, 0, 0.5);
+                color: #666666;
+                font-size: 16px;
+                transition: all 0.3s ease;
+            }
+
+            .gallery {
+                column-count: 2; /* 在屏幕宽度小于或等于768px时，每行显示2列 */
+            }
+            .delete-image {
+                position: absolute;
+                top: 5px;
+                width: 25px;
+                text-align: center;
+                cursor: pointer;
+                background: rgba(200, 0, 0, 0.5);
+                color: white;
+                border: none;
+                border-radius: 5px;
+
+                z-index: 10;
+            }
+        }
+
+
+
+        /* 简化导航 */
+        .sidebar ul {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 性能优化 */
+        /* 这部分需要在服务器端或通过工具进行图片优化 */
+
+        /* 表单输入 */
+        input[type="text"] {
+            font-size: 16px; /* 调整字体大小 */
+        }
+
+        /* 字体大小 */
+        body {
+            font-size: 14px; /* 调整基础字体大小 */
+        }
+    </style>
+    <link rel="icon" href="../static/logo.png">
+</head>
+<body>
+    <!-- 加载动画 -->
+<div id="loading" class="loading-container">
+    <div class="spinner"></div>
+</div>
+<!-- 搜索按钮 -->
+<button class="search-btn" id="searchBtn" aria-label="搜索按钮"><i class="fas fa-search"></i></button>
+
+<!-- 搜索输入框和按钮 -->
+<div class="search-box" id="searchBox">
+    <input type="text" id="searchInput" placeholder="输入搜索关键词">
+    <button class="close-search-btn">关闭</button>
+    <button onclick="loadSearchImages()">搜索</button>
+</div>
+<!-- 侧边栏 -->
+<nav class="sidebar" id="sidebar" aria-label="Sidebar Navigation">
+    <button class="toggle-sidebar-btn" onclick="toggleSidebar()" aria-label="关闭侧边栏">关闭</button>
+    <ul class="sidebar-menu">
+        <li><a href="#" onclick="goHome()" title="返回首页">首页</a></li>
+        <li><a href="#link1" onclick="showUploadForm()" title="上传图片">上传</a></li>
+        <li><a href="#link2" onclick="loadTrashImages()" title="查看回收站">回收</a></li>
+    </ul>
+</nav>
+
+<!-- 打开侧边栏按钮 -->
+<button class="open-sidebar-btn hidden" id="openSidebarBtn" onclick="toggleSidebar()" aria-label="打开侧边栏">≡</button>
+
+<!-- 主标题 -->
+<header>
+    <h1 class="gallery-title" aria-label="QGallery">QGallery</h1>
+</header>
+
+<!-- 图片展示区域 -->
+<main>
+    <section class="gallery" id="gallery" aria-label="图片展示"></section>
+</main>
+
+<!-- 查看大图模态框 -->
+<div id="originalImageModal" class="modal" onclick="hideOriginalImage()" role="dialog" aria-labelledby="originalImage">
+    <img id="originalImage" alt="Original Image" class="modal-image">
+</div>
+
+<!-- 上传图片的模态框 -->
+<div id="iframeModal" class="modal" onclick="hideIframe()" role="dialog" aria-labelledby="uploadIframe">
+    <iframe id="uploadIframe" src="" frameborder="0" title="上传图片表单" class="modal-iframe"></iframe>
+</div>
+    <script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+    <script>
+        const socket = io(`${window.location.origin}`);
+
+socket.on('file_uploaded', function(data) {
+    console.log('文件上传成功:', data.message);
+    loadImages();
+});
+
+function goHome() {
+    window.location.href = `${window.location.origin}`;
+}
+
+function loadImages() {
+    fetch(`${window.location.origin}/api/home_images`)
+        .then(response => response.json())
+        .then(images => {
+            const gallery = document.getElementById('gallery');
+            const loading = document.getElementById('loading');
+            gallery.innerHTML = '';  // 清空当前图片显示
+            images.forEach(image => {
+                const imageItem = document.createElement('div');
+                imageItem.className = 'image-item';
+
+                // 占位图片
+                const img = document.createElement('img');
+                img.setAttribute('data-src', `${window.location.origin}/${image.compressed_path}`);
+                img.src = '../static/loading.gif'; // 使用占位图片
+                img.alt = 'Image';
+                img.classList.add('lazy'); // 标记为懒加载图片
+
+                img.onclick = () => showOriginalImage(image.compressed_path); // 点击查看原图
+                imageItem.appendChild(img);
+
+                // 删除按钮
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = '删除';
+                deleteBtn.className = 'delete-image';
+                deleteBtn.onclick = () => deleteImage(image.compressed_path);
+                imageItem.appendChild(deleteBtn);
+
+                // 添加标签按钮
+                const addTagBtn = document.createElement('button');
+                addTagBtn.textContent = '添加标签';
+                addTagBtn.className = 'add-tag-image';
+                addTagBtn.onclick = () => addTag(image.compressed_path); // 绑定添加标签的事件
+                imageItem.appendChild(addTagBtn);
+
+                // 显示标签
+                const tagsContainer = document.createElement('div');
+                tagsContainer.className = 'tags-container'; // 修改类名为 'tags-container'
+                if (image.tags && image.tags.length > 0) {
+                    image.tags.forEach(tag => {
+                        const tagSpan = document.createElement('span');
+                        tagSpan.textContent = tag;
+                        tagSpan.className = 'tag';
+                        tagSpan.onclick = () => searchByTag(tag); // 点击标签时搜索该标签
+                        tagsContainer.appendChild(tagSpan);
+                    });
+                }
+                imageItem.appendChild(tagsContainer);
+
+                gallery.appendChild(imageItem);
+            });
+
+            loading.style.display = 'none';
+            gallery.style.display = 'block';
+
+            lazyLoadImages(); // 启用懒加载
+        })
+        .catch(error => {
+            console.error("加载主页图片失败:", error);
+        });
+}
+
+function lazyLoadImages() {
+    const lazyImages = document.querySelectorAll('img.lazy');
+    const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                img.src = img.getAttribute('data-src'); // 设置真实图片地址
+                img.removeAttribute('data-src'); // 移除 data-src 属性
+                img.classList.remove('lazy'); // 移除懒加载标记
+                observer.unobserve(img); // 停止观察
+            }
+        });
+    });
+
+    lazyImages.forEach(image => {
+        observer.observe(image);
+    });
+}
+
+// 处理搜索功能
+function loadSearchImages() {
+    const searchQuery = document.getElementById('searchInput').value;
+    fetch(`${window.location.origin}/api/search_images?query=${encodeURIComponent(searchQuery)}`)
+        .then(response => response.json())
+        .then(images => {
+            const gallery = document.getElementById('gallery');
+            const loading = document.getElementById('loading');
+            gallery.innerHTML = '';  // 清空当前图片显示
+            images.forEach(imageData => {
+                const imageItem = document.createElement('div');
+                imageItem.className = 'image-item';
+
+                // 占位图片
+                const img = document.createElement('img');
+                img.setAttribute('data-src', `${window.location.origin}/${imageData.compressed_path}`);
+                img.src = 'loading.gif'; // 使用占位图片
+                img.alt = 'Image';
+                img.classList.add('lazy'); // 标记为懒加载图片
+
+                img.onclick = () => showOriginalImage(imageData.compressed_path); // 点击查看原图
+                imageItem.appendChild(img);
+
+                // 显示标签
+                const tagsContainer = document.createElement('div');
+                tagsContainer.className = 'tags-container';
+                imageData.tags.forEach(tag => {
+                    const tagSpan = document.createElement('span');
+                    tagSpan.textContent = tag;
+                    tagSpan.className = 'tag';
+                    tagSpan.onclick = () => searchByTag(tag); // 点击标签时搜索该标签
+                    tagsContainer.appendChild(tagSpan);
+                });
+                imageItem.appendChild(tagsContainer);
+
+                // 添加标签按钮
+                const addTagBtn = document.createElement('button');
+                addTagBtn.textContent = '添加标签';
+                addTagBtn.className = 'add-tag-image';
+                addTagBtn.onclick = () => addTag(imageData.compressed_path); // 绑定添加标签的事件
+                imageItem.appendChild(addTagBtn);
+
+                // 删除按钮
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = '删除';
+                deleteBtn.className = 'delete-image';
+                deleteBtn.onclick = () => deleteImage(imageData.compressed_path);
+                imageItem.appendChild(deleteBtn);
+
+                gallery.appendChild(imageItem);
+            });
+
+            loading.style.display = 'none';
+            gallery.style.display = 'block';
+
+            lazyLoadImages(); // 启用懒加载
+        })
+        .catch(error => {
+            console.error("加载搜索结果失败:", error);
+        })
+        .finally(() => {
+            // 搜索完成后隐藏搜索框
+            hideSearchBar();
+        });
+}
+
+// 显示搜索框
+function showSearchBar() {
+    const searchBox = document.getElementById('searchBox');
+    searchBox.classList.add('active');
+}
+
+// 隐藏搜索框
+function hideSearchBar() {
+    const searchBox = document.getElementById('searchBox');
+    searchBox.classList.remove('active');
+}
+
+// 处理搜索按钮点击事件
+document.getElementById('searchBtn').addEventListener('click', function() {
+    showSearchBar(); // 显示搜索输入框
+});
+
+// 监听搜索框的关闭按钮，如果有的话
+document.querySelector('.search-box button').addEventListener('click', function(event) {
+    if (event.target.matches('.close-search-btn')) {
+        hideSearchBar(); // 隐藏搜索输入框
+    }
+});
+
+// 添加标签的函数
+function addTag(imagePath) {
+    // 弹出对话框让用户输入标签
+    const tag = prompt('请输入标签:');
+    if (tag) {
+        // 构造请求体
+        const data = {
+            path: imagePath,
+            tag: tag
+        };
+
+        // 发送POST请求到服务器
+        fetch(`${window.location.origin}/api/add_tag`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                alert('标签添加成功');
+                loadImages(); // 重新加载图片
+            } else {
+                alert('标签添加失败: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error("添加标签失败:", error);
+        });
+    }
+}
+
+function showOriginalImage(compressedPath) {
+    fetch(`${window.location.origin}/api/original_image?compressed_path=${compressedPath}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.original_image_path) {
+                const modal = document.getElementById('originalImageModal');
+                const originalImage = document.getElementById('originalImage');
+                originalImage.src = `${window.location.origin}/${data.original_image_path}`;
+                modal.classList.add('active');
+            }
+        })
+        .catch(error => {
+            console.error("获取原始图片失败:", error);
+        });
+}
+
+function hideOriginalImage() {
+    const modal = document.getElementById('originalImageModal');
+    modal.classList.remove('active');
+}
+
+function showUploadForm() {
+    const iframeModal = document.getElementById('iframeModal');
+    const iframe = document.getElementById('uploadIframe');
+    // 使用 Flask 路由地址替换原来的直接文件路径
+    iframe.src = "/InputImg";
+    iframeModal.classList.add('active');
+}
+
+function hideIframe() {
+    const iframeModal = document.getElementById('iframeModal');
+    const iframe = document.getElementById('uploadIframe');
+    iframe.src = "";
+    iframeModal.classList.remove('active');
+    loadImages();
+}
+
+function deleteImage(imagePath) {
+    if (confirm('确定要删除这张图片吗？')) {
+        fetch(`${window.location.origin}/api/delete_image`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ path: imagePath })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('图片删除成功');
+                loadImages(); // 重新加载图片
+            } else {
+                alert('图片删除失败');
+            }
+        })
+        .catch(error => {
+            console.error("删除图片失败:", error);
+        });
+    }
+}
+
+function recoverImage(imagePath) {
+    if (confirm('确定要恢复这张图片吗？')) {
+        fetch(`${window.location.origin}/api/recover_image`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ path: imagePath })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('图片恢复成功');
+                loadTrashImages(); // 重新加载回收站图片
+            } else {
+                alert('图片恢复失败');
+            }
+        })
+        .catch(error => {
+            console.error("恢复图片失败:", error);
+        });
+    }
+}
+
+function loadTrashImages() {
+    fetch(`${window.location.origin}/api/trash_images`)
+        .then(response => response.json())
+        .then(images => {
+            const gallery = document.getElementById('gallery');
+            const loading = document.getElementById('loading');
+            gallery.innerHTML = ''; // 清空当前图片显示
+            images.forEach(imageData => {
+                const imageItem = document.createElement('div');
+                imageItem.className = 'image-item';
+
+                // 占位图片
+                const img = document.createElement('img');
+                img.setAttribute('data-src', `${window.location.origin}/${imageData.compressed_path}`);
+                img.src = 'loading.gif'; // 使用占位图片
+                img.alt = 'Image';
+                img.classList.add('lazy'); // 标记为懒加载图片
+
+                // 查看原图
+                img.onclick = () => showOriginalImage(imageData.compressed_path); // 点击查看原图
+
+                imageItem.appendChild(img);
+
+                // 显示标签
+                const tagsContainer = document.createElement('div');
+                tagsContainer.className = 'tags-container';
+                imageData.tags.forEach(tag => {
+                    const tagSpan = document.createElement('span');
+                    tagSpan.textContent = tag;
+                    tagSpan.className = 'tag';
+                    tagSpan.onclick = () => searchByTag(tag); // 点击标签时搜索该标签
+                    tagsContainer.appendChild(tagSpan);
+                });
+                imageItem.appendChild(tagsContainer);
+
+                // 恢复按钮
+                const recoverBtn = document.createElement('button');
+                recoverBtn.textContent = '恢复';
+                recoverBtn.className = 'recover-image';
+                recoverBtn.onclick = () => recoverImage(imageData.compressed_path);
+                imageItem.appendChild(recoverBtn);
+
+                // 删除按钮
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = '彻底删除';
+                deleteBtn.className = 'delete-image';
+                deleteBtn.onclick = () => destroyImage(imageData.compressed_path);
+                imageItem.appendChild(deleteBtn);
+
+                gallery.appendChild(imageItem);
+            });
+
+            loading.style.display = 'none';
+            gallery.style.display = 'block';
+
+            lazyLoadImages(); // 启用懒加载
+        })
+        .catch(error => {
+            console.error("加载回收站图片失败:", error);
+        });
+}
+
+// 定义搜索标签的函数
+function searchByTag(tag) {
+    const searchQuery = encodeURIComponent(tag);
+    fetch(`${window.location.origin}/api/search_images?query=${searchQuery}`)
+        .then(response => response.json())
+        .then(images => {
+            const gallery = document.getElementById('gallery');
+            const loading = document.getElementById('loading');
+            gallery.innerHTML = '';  // 清空当前图片显示
+            images.forEach(imageData => {
+                const imageItem = document.createElement('div');
+                imageItem.className = 'image-item';
+
+                // 占位图片
+                const img = document.createElement('img');
+                img.setAttribute('data-src', `${window.location.origin}/${imageData.compressed_path}`);
+                img.src = 'loading.gif'; // 使用占位图片
+                img.alt = 'Image';
+                img.classList.add('lazy'); // 标记为懒加载图片
+
+                img.onclick = () => showOriginalImage(imageData.compressed_path); // 点击查看原图
+                imageItem.appendChild(img);
+
+                // 显示标签
+                const tagsContainer = document.createElement('div');
+                tagsContainer.className = 'tags-container';
+                imageData.tags.forEach(innerTag => {
+                    const innerTagSpan = document.createElement('span');
+                    innerTagSpan.textContent = innerTag;
+                    innerTagSpan.className = 'tag';
+                    innerTagSpan.onclick = () => searchByTag(innerTag); // 点击标签时搜索该标签
+                    tagsContainer.appendChild(innerTagSpan);
+                });
+                imageItem.appendChild(tagsContainer);
+
+                // 添加标签按钮
+                const addTagBtn = document.createElement('button');
+                addTagBtn.textContent = '添加标签';
+                addTagBtn.className = 'add-tag-image';
+                addTagBtn.onclick = () => addTag(imageData.compressed_path); // 绑定添加标签的事件
+                imageItem.appendChild(addTagBtn);
+
+                // 删除按钮
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = '删除';
+                deleteBtn.className = 'delete-image';
+                deleteBtn.onclick = () => deleteImage(imageData.compressed_path);
+                imageItem.appendChild(deleteBtn);
+
+                gallery.appendChild(imageItem);
+            });
+
+            loading.style.display = 'none';
+            gallery.style.display = 'block';
+
+            lazyLoadImages(); // 启用懒加载
+        })
+        .catch(error => {
+            console.error("搜索失败:", error);
+        });
+}
+
+function destroyImage(imagePath) {
+    if (confirm('确定要彻底删除这张图片吗？')) {
+        fetch(`${window.location.origin}/api/destroy_image`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ path: imagePath })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('图片已彻底删除');
+                loadTrashImages(); // 重新加载回收站图片
+            } else {
+                alert('图片删除失败');
+            }
+        })
+        .catch(error => {
+            console.error("删除图片失败:", error);
+        });
+    }
+}
+
+
+//缩放
+const originalImage = document.getElementById('originalImage');
+
+let lastScale = 1; // 初始缩放比例
+
+// 监听滚轮事件进行缩放
+originalImage.addEventListener('wheel', function(event) {
+    event.preventDefault(); // 阻止默认滚动行为
+
+    const delta = event.deltaY; // 获取滚动的量，正值向上滚动，负值向下滚动
+
+    // 计算新的缩放比例
+    let newScale = lastScale + (delta * 0.01); // 缩放因子可以根据需要调整
+
+    // 设置缩放比例的边界，例如最小0.5，最大2
+    newScale = Math.max(0.5, Math.min(newScale, 2));
+
+    // 更新图片的缩放比例
+    originalImage.style.transform = `scale(${newScale})`;
+
+    // 更新最后缩放比例
+    lastScale = newScale;
+});
+
+// 监听手势事件进行缩放
+originalImage.addEventListener('gesturestart', function(event) {
+    lastScale = parseFloat(originalImage.style.transform.replace('scale(', '').replace(')', ''));
+});
+
+originalImage.addEventListener('gestureend', function(event) {
+    lastScale = parseFloat(originalImage.style.transform.replace('scale(', '').replace(')', ''));
+});
+
+originalImage.addEventListener('gesturechange', function(event) {
+    event.preventDefault(); // 阻止默认的缩放行为
+
+    const newScale = lastScale * event.scale; // 计算新的缩放比例
+
+    // 设置缩放比例的边界
+    newScale = Math.max(0.5, Math.min(newScale, 2));
+
+    // 更新图片的缩放比例
+    originalImage.style.transform = `scale(${newScale})`;
+});
+
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const openSidebarBtn = document.getElementById('openSidebarBtn');
+    const gallery = document.getElementById('gallery');
+
+    sidebar.classList.toggle('hidden');
+    openSidebarBtn.classList.toggle('hidden');
+
+    if (sidebar.classList.contains('hidden')) {
+        gallery.style.marginLeft = '0';  // 调整图片位置
+    } else {
+        gallery.style.marginLeft = '120px';  // 恢复侧边栏位置
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadImages();
+});
+
+
+
+    </script>
+</body>
+</html>
